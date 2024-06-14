@@ -73,12 +73,12 @@ jobs:
         run: brew install defenseunicorns/tap/uds@0.11.2
       - name: Run Formatting Checks
         run: uds run lint-check --no-progress
-      - name: Mark Check Completion Status
+      - name: Mark Check Result
         if: always()
         uses: ./.github/actions/status-checks
         with:
           ghToken: ${{ github.token }}
-          status: ${{ (success() && 'success') || (failure() && 'failure') || 'error' }}
+          status: ${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}
           url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           name: "Filter / lint-check (pull_request)"
           repo: ${{ github.repository }}
