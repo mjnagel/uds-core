@@ -57,7 +57,7 @@ jobs:
           ghToken: "${{ github.token }}"
           status: "pending"
           url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          name: "Filter / lint-check (pull_request)"
+          name: "lint-check"
           repo: "${{ github.repository }}"
           sha: "${{ needs.pr-info.outputs.prSHA }}"
       - name: Use Node.js latest
@@ -79,7 +79,7 @@ jobs:
           ghToken: ${{ github.token }}
           status: ${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}
           url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          name: "Filter / lint-check (pull_request)"
+          name: "lint-check"
           repo: ${{ github.repository }}
           sha: ${{ needs.pr-info.outputs.prSHA }}
 

@@ -38,14 +38,17 @@ runs:
           echo "DESCRIPTION=Unknown status" >> $GITHUB_ENV
         fi
       shell: bash
+    - name: Get Job ID
     - name: Post Status Check
       env:
         GH_TOKEN: ${{ inputs.ghToken }}
       run: |
+        jobs=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id}}/attempts/${{ github.run_attempt }}/jobs)
+        job_id=$(echo $jobs | jq -r '.jobs[] | select(.runner_name=="${{ runner.name }}") | .id')
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           /repos/${{inputs.repo}}/statuses/${{inputs.sha}} \
-          -f "state=${{inputs.status}}" -f "target_url=${{inputs.url}}" -f "context=${{inputs.name}}" -f "description=$DESCRIPTION"
+          -f "state=${{inputs.status}}" -f "target_url=${{inputs.url}}/jobs/$job_id" -f "context=${{inputs.name}}" -f "description=$DESCRIPTION"
       shell: bash
