@@ -38,7 +38,6 @@ runs:
           echo "DESCRIPTION=Unknown status" >> $GITHUB_ENV
         fi
       shell: bash
-    - name: Get Job ID
     - name: Post Status Check
       env:
         GH_TOKEN: ${{ inputs.ghToken }}
