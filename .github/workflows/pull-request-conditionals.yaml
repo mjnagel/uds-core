@@ -2,9 +2,10 @@ name: Filter
 
 # This workflow is triggered on pull requests
 on:
-  pull_request:
-    # milestoned is added here as a workaround for release-please not triggering PR workflows (PRs should be added to a milestone to trigger the workflow).
-    types: [milestoned, opened, reopened, synchronize]
+  workflow_run:
+    workflows: ["PR Trigger"]
+    types:
+      - completed
 
 # Permissions for the GITHUB_TOKEN used by the workflow.
 permissions:
@@ -23,10 +24,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-check:
+  pr-info:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - name: Download PR info artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: pr_info
+
+      - name: Read PR info
+        run: |
+          echo "PR_NUMBER=$(cat pr_number.txt)" >> $GITHUB_ENV
+          echo "PR_SHA=$(cat pr_sha.txt)" >> $GITHUB_ENV
+
+  lint-check:
+    needs: pr-info
+    runs-on: ubuntu-latest
+    steps:
+      # Todo: update pipeline status
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          ref: ${{ env.PR_SHA }}
       - name: Use Node.js latest
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
@@ -49,8 +67,11 @@ jobs:
       packages: ${{ steps.path-filter.outputs.changes }}
 
     steps:
+      # Todo: update pipeline status
       - name: Checkout the code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          ref: ${{ env.PR_SHA }}
 
       # Uses a custom action to filter paths for source packages.
       - name: Check src paths
@@ -80,4 +101,5 @@ jobs:
       package: ${{ matrix.package }}
       flavor: ${{ matrix.flavor }}
       test_type: ${{ matrix.test_type }}
+      sha: ${{ env.PR_SHA }}
     secrets: inherit # Inherits all secrets from the parent workflow.

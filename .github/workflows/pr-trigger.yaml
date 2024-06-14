@@ -1,0 +1,22 @@
+name: PR Trigger
+
+on:
+  pull_request:
+    # milestoned is added here as a workaround for release-please not triggering PR workflows (PRs should be added to a milestone to trigger the workflow).
+    types: [milestoned, opened, reopened, synchronize]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:        
+      - run: |
+          echo ${{ github.event.number }} > pr_number.txt
+          echo "${{ github.event.pull_request.head.sha }}" >> pr_sha.txt
+
+      - name: Upload PR number artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: pr_info
+          path: |
+            pr_number.txt
+            pr_sha.txt
