@@ -34,8 +34,8 @@ jobs:
 
       - name: Read PR info
         run: |
-          echo "PR_NUMBER=$(cat pr_number.txt)" >> $GITHUB_ENV
-          echo "PR_SHA=$(cat pr_sha.txt)" >> $GITHUB_ENV
+          echo "PR_NUMBER=$(cat pr_number.txt)" >> $GITHUB_OUTPUT
+          echo "PR_SHA=$(cat pr_sha.txt)" >> $GITHUB_OUTPUT
 
   lint-check:
     needs: pr-info
@@ -44,7 +44,7 @@ jobs:
       # Todo: update pipeline status
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: ${{ env.PR_SHA }}
+          ref: ${{ needs.pr-info.outputs.PR_SHA }}
       - name: Use Node.js latest
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
@@ -60,7 +60,9 @@ jobs:
 
   # This job checks if there are changes in specific paths source packages.
   check-paths:
-    needs: lint-check
+    needs: 
+      - lint-check
+      - pr-info
     runs-on: ubuntu-latest
     name: Select Jobs
     outputs:
@@ -71,7 +73,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: ${{ env.PR_SHA }}
+          ref: ${{ needs.pr-info.outputs.PR_SHA }}
 
       # Uses a custom action to filter paths for source packages.
       - name: Check src paths
@@ -82,7 +84,9 @@ jobs:
 
   # This job triggers a separate workflow for each changed source package, if any.
   run-package-test:
-    needs: check-paths
+    needs: 
+      - check-paths
+      - pr-info
     name: Schedule
     strategy:
       matrix:
@@ -101,5 +105,5 @@ jobs:
       package: ${{ matrix.package }}
       flavor: ${{ matrix.flavor }}
       test_type: ${{ matrix.test_type }}
-      sha: ${{ env.PR_SHA }}
+      sha: ${{ needs.pr-info.outputs.PR_SHA }}
     secrets: inherit # Inherits all secrets from the parent workflow.
