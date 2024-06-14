@@ -8,7 +8,7 @@ on:
 jobs:
   pr-info:
     runs-on: ubuntu-latest
-    steps:        
+    steps:
       - run: |
           echo ${{ github.event.number }} > pr_number.txt
           echo "${{ github.event.pull_request.head.sha }}" >> pr_sha.txt
