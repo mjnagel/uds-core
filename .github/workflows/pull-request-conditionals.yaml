@@ -36,21 +36,25 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Read PR info
+        id: read-info
         run: |
           echo "PR_NUMBER=$(cat pr_number.txt)" >> $GITHUB_OUTPUT
           echo "PR_SHA=$(cat pr_sha.txt)" >> $GITHUB_OUTPUT
+    outputs:
+      prNumber: ${{ steps.read-info.outputs.PR_NUMBER }}
+      prSHA: ${{ steps.read-info.outputs.PR_SHA }}
 
   lint-check:
     needs: pr-info
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo ${{ needs.pr-info.outputs.PR_NUMBER }}
-          echo ${{ needs.pr-info.outputs.PR_SHA }}
+          echo ${{ needs.pr-info.outputs.prNumber }}
+          echo ${{ needs.pr-info.outputs.prSHA }}
       # Todo: update pipeline status
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: ${{ needs.pr-info.outputs.PR_SHA }}
+          ref: ${{ needs.pr-info.outputs.prSHA }}
       - name: Use Node.js latest
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
@@ -79,7 +83,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: ${{ needs.pr-info.outputs.PR_SHA }}
+          ref: ${{ needs.pr-info.outputs.prSHA }}
 
       # Uses a custom action to filter paths for source packages.
       - name: Check src paths
@@ -111,5 +115,5 @@ jobs:
       package: ${{ matrix.package }}
       flavor: ${{ matrix.flavor }}
       test_type: ${{ matrix.test_type }}
-      sha: ${{ needs.pr-info.outputs.PR_SHA }}
+      sha: ${{ needs.pr-info.outputs.prSHA }}
     secrets: inherit # Inherits all secrets from the parent workflow.
