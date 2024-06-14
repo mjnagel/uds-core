@@ -23,6 +23,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write # Allows writing action statuses
 
 jobs:
   test:
@@ -33,11 +34,15 @@ jobs:
       UDS_PKG: ${{ inputs.package }}
 
     steps:
-      # Todo: update pipeline status
       - name: Checkout repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           ref: ${{ inputs.sha }}
+      - name: Mark Check as Started
+        uses: ./.github/actions/status-checks
+        with:
+          status: "pending"
+          sha: ${{ inputs.sha }}
 
       - name: Environment setup
         uses: ./.github/actions/setup
@@ -67,3 +72,10 @@ jobs:
         uses: ./.github/actions/save-logs
         with:
           suffix: -${{ inputs.test_type }}-${{ inputs.package }}-${{ inputs.flavor }}
+
+      - name: Mark Check Result
+        if: always()
+        uses: ./.github/actions/status-checks
+        with:
+          status: ${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}
+          sha: ${{ inputs.sha }}

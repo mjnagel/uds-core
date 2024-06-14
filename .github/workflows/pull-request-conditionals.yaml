@@ -86,7 +86,6 @@ jobs:
       packages: ${{ steps.path-filter.outputs.changes }}
 
     steps:
-      # Todo: update pipeline status
       - name: Checkout the code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Mark Check as Started
