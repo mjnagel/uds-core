@@ -22,7 +22,7 @@ defaults:
 
 # Abort prior jobs in the same workflow / PR
 concurrency:
-  group: test-${{ github.ref }}
+  group: test-${{ github.event.workflow_run.head_branch }}
   cancel-in-progress: true
 
 jobs:
