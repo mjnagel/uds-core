@@ -27,11 +27,14 @@ jobs:
   pr-info:
     runs-on: ubuntu-latest
     steps:
+      - name: Info log
+        run: |
+          echo ${{ github.event.workflow_run }}
       - name: Download PR info artifact
         uses: actions/download-artifact@v4
         with:
           name: pr_info
-          run-id: ${{ github.event.workflow_run.id }} # Pulls artifact from the PR workflow run
+          run-id: ${{ github.event.workflow_run.workflow_id }} # Pulls artifact from the PR workflow run
 
       - name: Read PR info
         run: |
