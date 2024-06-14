@@ -12,7 +12,8 @@ permissions:
   id-token: write # Needed for OIDC-related operations.
   contents: read # Allows reading the content of the repository.
   pull-requests: read # Allows reading pull request metadata.
-  actions: read
+  actions: read # Allows reading artifacts from other workflow runs
+  statuses: write # Allows writing action statuses
 
 # Default settings for all run commands in the workflow jobs.
 defaults:
@@ -51,6 +52,15 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           ref: ${{ needs.pr-info.outputs.prSHA }}
+      - name: Mark Check as Started
+        uses: ./.github/actions/status-checks
+        with:
+          ghToken: ${{ github.token }}
+          status: "pending"
+          url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          name: "Filter / lint-check (pull_request)"
+          repo: ${{ github.repository }}
+          sha: ${{ steps.read-info.outputs.PR_SHA }}
       - name: Use Node.js latest
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
@@ -63,6 +73,16 @@ jobs:
         run: brew install defenseunicorns/tap/uds@0.11.2
       - name: Run Formatting Checks
         run: uds run lint-check --no-progress
+      - name: Mark Check Completion Status
+        if: always()
+        uses: ./.github/actions/status-checks
+        with:
+          ghToken: ${{ github.token }}
+          status: ${{ (success() && 'success') || (failure() && 'failure') || 'error' }}
+          url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          name: "Filter / lint-check (pull_request)"
+          repo: ${{ github.repository }}
+          sha: ${{ steps.read-info.outputs.PR_SHA }}
 
   # This job checks if there are changes in specific paths source packages.
   check-paths:
