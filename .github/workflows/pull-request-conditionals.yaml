@@ -34,7 +34,6 @@ jobs:
           name: pr_info
           run-id: ${{ github.event.workflow_run.id }} # Pulls artifact from the PR workflow run
           github-token: ${{ github.token }}
-
       - name: Read PR info
         id: read-info
         run: |
@@ -48,9 +47,6 @@ jobs:
     needs: pr-info
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo ${{ needs.pr-info.outputs.prNumber }}
-          echo ${{ needs.pr-info.outputs.prSHA }}
       # Todo: update pipeline status
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
