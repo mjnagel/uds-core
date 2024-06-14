@@ -8,6 +8,9 @@ inputs:
   sha:
     description: "The SHA for the status check"
     required: true
+  name:
+    description: "The name of the status check"
+    required: true
 
 runs:
   using: composite
@@ -39,6 +42,6 @@ runs:
           /repos/${{ github.repository }}/statuses/${{ inputs.sha }} \
           -f "state=${{ inputs.status }}" \
           -f "target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/$job_id" \
-          -f "context=${{ github.job }}" \
+          -f "context=${{ inputs.name }}" \
           -f "description=$DESCRIPTION"
       shell: bash
