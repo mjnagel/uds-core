@@ -28,8 +28,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Info log
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github.event.workflow_run) }}
         run: |
-          echo ${{ toJson(github.event.workflow_run) }}
+          echo "$GITHUB_CONTEXT"
       - name: Download PR info artifact
         uses: actions/download-artifact@v4
         with:
