@@ -19,7 +19,7 @@ inputs:
     required: true
   sha:
     description: "The SHA for the status check"
-  
+    required: true
 
 runs:
   using: composite

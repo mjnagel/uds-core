@@ -54,12 +54,12 @@ jobs:
       - name: Mark Check as Started
         uses: ./.github/actions/status-checks
         with:
-          ghToken: ${{ github.token }}
+          ghToken: "${{ github.token }}"
           status: "pending"
           url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           name: "Filter / lint-check (pull_request)"
-          repo: ${{ github.repository }}
-          sha: ${{ steps.read-info.outputs.PR_SHA }}
+          repo: "${{ github.repository }}"
+          sha: "${{ needs.pr-info.outputs.prSHA }}"
       - name: Use Node.js latest
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
@@ -81,7 +81,7 @@ jobs:
           url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           name: "Filter / lint-check (pull_request)"
           repo: ${{ github.repository }}
-          sha: ${{ steps.read-info.outputs.PR_SHA }}
+          sha: ${{ needs.pr-info.outputs.prSHA }}
 
   # This job checks if there are changes in specific paths source packages.
   check-paths:
