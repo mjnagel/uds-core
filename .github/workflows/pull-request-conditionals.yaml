@@ -34,6 +34,8 @@ jobs:
           name: pr_info
           run-id: ${{ github.event.workflow_run.id }} # Pulls artifact from the PR workflow run
           github-token: ${{ github.token }}
+      - run: ls -la
+      - run: ls -la pr_info
       - name: Unzip PR info artifact
         run: unzip pr_info.zip
 
