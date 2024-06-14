@@ -2,20 +2,8 @@ name: status-checks
 description: "Update Status Checks"
 
 inputs:
-  ghToken:
-    description: 'GITHUB_TOKEN'
-    required: true
   status:
     description: "Status to set on the check, ex: pending, success, failure, error"
-    required: true
-  url:
-    description: "The URL for the status check run"
-    required: true
-  name:
-    description: "The name of the status check"
-    required: true
-  repo:
-    description: "The owner/repo for the status check"
     required: true
   sha:
     description: "The SHA for the status check"
@@ -40,14 +28,17 @@ runs:
       shell: bash
     - name: Post Status Check
       env:
-        GH_TOKEN: ${{ inputs.ghToken }}
+        GH_TOKEN: ${{ github.token }}
       run: |
-        jobs=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id}}/attempts/${{ github.run_attempt }}/jobs)
+        jobs=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs)
         job_id=$(echo $jobs | jq -r '.jobs[] | select(.runner_name=="${{ runner.name }}") | .id')
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/${{inputs.repo}}/statuses/${{inputs.sha}} \
-          -f "state=${{inputs.status}}" -f "target_url=${{inputs.url}}/jobs/$job_id" -f "context=${{inputs.name}}" -f "description=$DESCRIPTION"
+          /repos/${{ github.repository }}/statuses/${{ inputs.sha }} \
+          -f "state=${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}" \
+          -f "target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/$job_id" \
+          -f "context=${{ github.job }}" \
+          -f "description=$DESCRIPTION"
       shell: bash
