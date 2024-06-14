@@ -36,6 +36,7 @@ runs:
           echo "DESCRIPTION=Running..." >> $GITHUB_ENV
         else
           echo "DESCRIPTION=Unknown status" >> $GITHUB_ENV
+        fi
       shell: bash
     - name: Post Status Check
       env:
