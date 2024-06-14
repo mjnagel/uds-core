@@ -43,7 +43,7 @@ jobs:
         with:
           status: "pending"
           sha: ${{ inputs.sha }}
-          name: "Test ${{inputs.package}} ${{inputs.test_type}}, ${{inputs.flavor}} flavor"
+          name: "Schedule (${{inputs.package}}, ${{inputs.flavor}}, ${{inputs.test_type}}) / Test"
 
       - name: Environment setup
         uses: ./.github/actions/setup
@@ -80,4 +80,4 @@ jobs:
         with:
           status: ${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}
           sha: ${{ inputs.sha }}
-          name: "Test ${{inputs.package}} ${{inputs.test_type}}, ${{inputs.flavor}} flavor"
+          name: "Schedule (${{inputs.package}}, ${{inputs.flavor}}, ${{inputs.test_type}}) / Test"

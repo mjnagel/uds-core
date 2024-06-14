@@ -13,27 +13,27 @@
 
 - Ironbank workflows would be triggered by `issue_comment` and `repository_dispatch`.
 - This would provide a "ChatOps" like experience where a maintainer comments `/test` or similar to trigger checks requiring secrets.
-- Part of the triggered workflow would checkout the PRs code.
-- Secrets would work, enabling the full test suite to run.
-- Upstream and other workflows that don't require secrets could still run directly on `pull_request`
 - [slash-command-dispatch](https://github.com/peter-evans/slash-command-dispatch) is already used in some places in the company.
 - Downsides:
   - Workflows must be on `main` before they are used since the slash command will trigger a `main` workflow.
   - Extra process for triggering workflows (although this could reduce runner minute usage for renovate PRs)
-  - Decent amount of complexity and/or external action usage to make this process seamless (i.e. have to update the PR pipeline status "manually")
-  - May be unable to keep everything in the same concurrency group if in a separately triggered workflow
+  - Decent amount of complexity and/or external action usage to make this process seamless
+  - Job status is not fully accurate/realtime
+    - Jobs reflect as "Pending" with a description of "Running" (or whatever we want) rather than the normal GitHub spinner for running jobs
+    - Pending/Completed statuses are set during the job run so technically the status updates happen slightly after/before job start/finish
+    - There is no way to set a "Cancelled" status symbol via the API
 
 ## Use workflow run as trigger
 
 - Ironbank workflows would be triggered by `workflow_run` in response to `pull_request` workflows
-- This would be a fully automated process
-- Part of the triggered workflow would checkout the PRs code.
-- Secrets would work, enabling the full test suite to run.
-- Upstream and other workflows that don't require secrets could still run directly on `pull_request`
+- This would be a fully automated process/flow, and only be limited for outside contributors (manual approval needed)
 - Downsides:
-  - Workflows must be on `main` before they are used since the slash command will trigger a `main` workflow?
-  - Decent amount of complexity and/or external action usage to make this process seamless (i.e. have to update the PR pipeline status "manually")
-  - May be unable to keep everything in the same concurrency group if in a separately triggered workflow
+  - `workflow_run` changes must be on main before they are used 
+  - Job status is not fully accurate/realtime
+    - Jobs reflect as "Pending" with a description of "Running" (or whatever we want) rather than the normal GitHub spinner for running jobs
+    - Pending/Completed statuses are set during the job run so technically the status updates happen slightly after/before job start/finish
+    - There is no way to set a "Cancelled" status symbol via the API, but we can set error/failure and a description of "Cancelled"
+    - Any jobs that were triggered but pending (i.e. waiting on a runner) will not reflect their status in the PR since they have to start before status shows
 
 ## Use PR Target as Trigger
 
