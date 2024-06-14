@@ -37,7 +37,7 @@ runs:
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           /repos/${{ github.repository }}/statuses/${{ inputs.sha }} \
-          -f "state=${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}" \
+          -f "state=${{ input.status }}" \
           -f "target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/$job_id" \
           -f "context=${{ github.job }}" \
           -f "description=$DESCRIPTION"

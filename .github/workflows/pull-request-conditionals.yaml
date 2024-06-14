@@ -89,6 +89,11 @@ jobs:
       # Todo: update pipeline status
       - name: Checkout the code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: Mark Check as Started
+        uses: ./.github/actions/status-checks
+        with:
+          status: "pending"
+          sha: "${{ needs.pr-info.outputs.prSHA }}"
 
       # Uses a custom action to filter paths for source packages.
       - name: Check src paths
@@ -97,6 +102,12 @@ jobs:
         with:
           filters: .github/filters.yaml
           ref: ${{ needs.pr-info.outputs.prSHA }}
+      - name: Mark Check Result
+        if: always()
+        uses: ./.github/actions/status-checks
+        with:
+          status: ${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}
+          sha: ${{ needs.pr-info.outputs.prSHA }}
 
   # This job triggers a separate workflow for each changed source package, if any.
   run-package-test:
