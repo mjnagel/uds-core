@@ -39,7 +39,7 @@ runs:
       shell: bash
     - name: Post Status Check
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.ghToken }}
       run: |
         gh api \
           --method POST \
