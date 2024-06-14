@@ -56,7 +56,7 @@ jobs:
         with:
           status: "pending"
           sha: "${{ needs.pr-info.outputs.prSHA }}"
-          name: ${{ github.job }}
+          name: Lint Check
       - name: Use Node.js latest
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
@@ -75,7 +75,7 @@ jobs:
         with:
           status: ${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}
           sha: ${{ needs.pr-info.outputs.prSHA }}
-          name: ${{ github.job }}
+          name: Lint Check
 
   # This job checks if there are changes in specific paths source packages.
   check-paths:
@@ -95,7 +95,7 @@ jobs:
         with:
           status: "pending"
           sha: "${{ needs.pr-info.outputs.prSHA }}"
-          name: ${{ github.job }}
+          name: Filter on Changes
 
       # Uses a custom action to filter paths for source packages.
       - name: Check src paths
@@ -110,7 +110,7 @@ jobs:
         with:
           status: ${{ job.status == 'success' && 'success' || job.status == 'failure' && 'failure' || 'error' }}
           sha: ${{ needs.pr-info.outputs.prSHA }}
-          name: ${{ github.job }}
+          name: Filter on Changes
 
   # This job triggers a separate workflow for each changed source package, if any.
   run-package-test:
